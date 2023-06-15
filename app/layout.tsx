@@ -1,7 +1,7 @@
 import { Inter } from "next/font/google";
 import React, { type PropsWithChildren } from "react";
 
-import "./globals.css";
+import ".styles/globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
