@@ -1,20 +1,57 @@
 "use client";
 
 import { useCompletion } from "ai/react";
-import React from "react";
+import React, { type FormEvent, useState } from "react";
 
 export default function CompletionForm() {
   const {
     completion,
     input,
     isLoading,
+    complete,
     handleInputChange,
-    handleSubmit,
+    setInput,
     stop,
   } = useCompletion();
+  const [type, setType] = useState("reply");
+
+  // not using handleSubmit since additional custom attributes are needed
+  const onFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    let custAttributes: Record<string, string> = {};
+    switch (type) {
+      case "reply":
+      case "synopsis":
+        custAttributes = {
+          type,
+          outline: input,
+        };
+        break;
+      case "title":
+      case "stars":
+        custAttributes = {
+          type,
+          synopsis: input,
+        };
+        break;
+    }
+    complete(JSON.stringify(custAttributes));
+    setInput("");
+  };
 
   return (
-    <form className="grid grid-cols-1 gap-4 p-4" onSubmit={handleSubmit}>
+    <form className="grid grid-cols-1 gap-4 p-4" onSubmit={onFormSubmit}>
+      <select
+        name="type"
+        className="rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+        value={type}
+        onChange={(event) => setType(event.target.value)}
+      >
+        <option value="reply">reply</option>
+        <option value="synopsis">synopsis</option>
+        <option value="title">title</option>
+        <option value="stars">stars</option>
+      </select>
       <textarea
         name="message"
         className="border-2 border-solid border-gray-800"
